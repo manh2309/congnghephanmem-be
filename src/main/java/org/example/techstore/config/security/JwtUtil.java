@@ -30,6 +30,7 @@ public class JwtUtil {
         claims.put("token_type", "ACCESS");
         claims.put("accountId", accountEntity.getId());
         claims.put("roleId", accountEntity.getRole().getId());
+        claims.put("role", accountEntity.getRole().getRoleCode());
         return buildToken(claims, accountEntity.getUsername(), accessExpiration);
     }
 
