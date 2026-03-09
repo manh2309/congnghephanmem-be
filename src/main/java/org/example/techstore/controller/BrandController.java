@@ -9,6 +9,8 @@ import org.example.techstore.dto.request.brand.BrandRequest;
 import org.example.techstore.dto.response.ApiResponse;
 import org.example.techstore.service.BrandService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +24,25 @@ public class BrandController {
 
     @GetMapping
     @Operation(summary = "Lấy danh sách brand", description = "Chỉ lấy brand chưa bị xoá")
-    public ApiResponse<Object> getAllBrands(@RequestParam(required = false) String searchKey, Pageable pageable) {
+    public ApiResponse<Object> getAllBrands(@RequestParam(required = false) String searchKey,  @PageableDefault(
+            page = 0,
+            size = 10,
+            sort = "id",
+            direction = Sort.Direction.ASC
+    )
+    Pageable pageable) {
         return brandService.findAll(searchKey, pageable);
     }
 
     @GetMapping("/all")
     @Operation(summary = "Lấy danh sách brand (bao gồm đã xoá)", description = "Admin có thể xem tất cả brands")
-    public ApiResponse<Object> getAllIncludingDeleted(Pageable pageable) {
+    public ApiResponse<Object> getAllIncludingDeleted(@PageableDefault(
+            page = 0,
+            size = 10,
+            sort = "id",
+            direction = Sort.Direction.ASC
+    )
+    Pageable pageable) {
         return brandService.findAllIncludingDeleted(pageable);
     }
 
