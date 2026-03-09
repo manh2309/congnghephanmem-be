@@ -42,7 +42,7 @@ public class BrandServiceImpl implements BrandService {
                 .toList();
 
         MetaResponse meta = MetaResponse.builder()
-                .page(pageable.getPageNumber())
+                .page(pageable.getPageNumber() + 1)
                 .size(pageable.getPageSize())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
@@ -66,7 +66,7 @@ public class BrandServiceImpl implements BrandService {
                 .toList();
 
         MetaResponse meta = MetaResponse.builder()
-                .page(pageable.getPageNumber())
+                .page(pageable.getPageNumber() + 1)
                 .size(pageable.getPageSize())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
