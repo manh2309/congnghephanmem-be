@@ -24,4 +24,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 //    Optional<Account> findByUsernameAndDeletedAtIsNull(String username);
 
     List<Account> findByRole_Id(Long roleId);
+
+    List<Account> findByIsActiveTrue();
 }
