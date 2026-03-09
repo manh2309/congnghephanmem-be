@@ -13,6 +13,7 @@ public class Constant {
             public static final String TOKEN_REQUIRE_FOUND = "Token không được để trống";
             public static final String TOKEN_FOUND = "Token lỗi";
             public static final String TOKEN_NOT_VALID = "Token không hợp lệ";
+            public static final String UPLOAD_FILE_FOUND = "Upload anh that bat";
     }
 
     public static final class MESSAGE {
@@ -28,7 +29,10 @@ public class Constant {
 
     public static final class MODULE {
         public static final String BRAND = "Nhãn hàng";
+        public static final String ROLE = "Chức vụ";
+        public static final String IMAGE = "Hình ảnh";
         public static final String ACCOUNT = "Người dùng";
+        public static final String PRODUCT = "Sản phẩm";
 
     }
 }

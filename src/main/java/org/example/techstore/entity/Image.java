@@ -22,10 +22,11 @@ public class Image {
     @Column(nullable = false)
     private String publicId; // Để xóa/sửa trên Cloudinary
 
-    @Column(name = "is_main", nullable = false)
-    private Boolean isMain = false;
+    @Column(name = "is_main")
+    private Boolean isMain;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
 }
