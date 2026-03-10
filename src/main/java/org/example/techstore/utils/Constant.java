@@ -29,6 +29,7 @@ public class Constant {
     public static final class MODULE {
         public static final String BRAND = "Nhãn hàng";
         public static final String ACCOUNT = "Người dùng";
+        public static final Object PRODUCT = "Sản phẩm";
 
     }
 }
