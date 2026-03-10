@@ -12,8 +12,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class ProductDetailRequest {
-    private Configuration configuration;
+    private Long productId;
+    private Long configurationId;
     private Product product;
     private Integer quantity;
     private BigDecimal price;
+
+
 }

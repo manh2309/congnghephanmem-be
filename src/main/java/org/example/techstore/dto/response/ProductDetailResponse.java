@@ -14,9 +14,19 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDetailResponse extends BaseResponse {
+//    private Long id;
+//    private String productName;
+//    private Configuration configuration;
+//    private Product product;
+//    private Integer quantity;
+//    private BigDecimal price;
     private Long id;
-    private Configuration configuration;
-    private Product product;
+
+    private String productName;
+
+    private String configurationName;
+
     private Integer quantity;
+
     private BigDecimal price;
 }

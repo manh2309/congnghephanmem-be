@@ -5,12 +5,14 @@ import java.util.List;
 import javax.annotation.processing.Generated;
 import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.response.ProductDetailResponse;
+import org.example.techstore.entity.Configuration;
+import org.example.techstore.entity.Product;
 import org.example.techstore.entity.ProductDetail;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-03-10T09:57:28+0700",
+    date = "2026-03-10T11:43:10+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Oracle Corporation)"
 )
 @Component
@@ -24,8 +26,6 @@ public class ProductDetailMapperImpl implements ProductDetailMapper {
 
         ProductDetail.ProductDetailBuilder<?, ?> productDetail = ProductDetail.builder();
 
-        productDetail.configuration( dto.getConfiguration() );
-        productDetail.product( dto.getProduct() );
         productDetail.quantity( dto.getQuantity() );
         productDetail.price( dto.getPrice() );
 
@@ -40,9 +40,9 @@ public class ProductDetailMapperImpl implements ProductDetailMapper {
 
         ProductDetailResponse.ProductDetailResponseBuilder productDetailResponse = ProductDetailResponse.builder();
 
+        productDetailResponse.productName( entityProductName( entity ) );
+        productDetailResponse.configurationName( entityConfigurationName( entity ) );
         productDetailResponse.id( entity.getId() );
-        productDetailResponse.configuration( entity.getConfiguration() );
-        productDetailResponse.product( entity.getProduct() );
         productDetailResponse.quantity( entity.getQuantity() );
         productDetailResponse.price( entity.getPrice() );
 
@@ -69,17 +69,41 @@ public class ProductDetailMapperImpl implements ProductDetailMapper {
             return;
         }
 
-        if ( dto.getConfiguration() != null ) {
-            entity.setConfiguration( dto.getConfiguration() );
-        }
-        if ( dto.getProduct() != null ) {
-            entity.setProduct( dto.getProduct() );
-        }
         if ( dto.getQuantity() != null ) {
             entity.setQuantity( dto.getQuantity() );
         }
         if ( dto.getPrice() != null ) {
             entity.setPrice( dto.getPrice() );
         }
+    }
+
+    private String entityProductName(ProductDetail productDetail) {
+        if ( productDetail == null ) {
+            return null;
+        }
+        Product product = productDetail.getProduct();
+        if ( product == null ) {
+            return null;
+        }
+        String name = product.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
+    }
+
+    private String entityConfigurationName(ProductDetail productDetail) {
+        if ( productDetail == null ) {
+            return null;
+        }
+        Configuration configuration = productDetail.getConfiguration();
+        if ( configuration == null ) {
+            return null;
+        }
+        String name = configuration.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
     }
 }

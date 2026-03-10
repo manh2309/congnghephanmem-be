@@ -13,19 +13,20 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ProductDetailMapper {
+        @Mapping(target = "id", ignore = true)
+        @Mapping(target = "product", ignore = true)
+        @Mapping(target = "configuration", ignore = true)
+        @Mapping(target = "isActive", ignore = true)
+        ProductDetail toEntity(ProductDetailRequest dto);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "modifiedDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "modifiedBy", ignore = true)
-    @Mapping(target = "isActive", ignore = true)
-    ProductDetail toEntity(ProductDetailRequest dto);
+        @Mapping(source = "product.name", target = "productName")
+        @Mapping(source = "configuration.name", target = "configurationName")
+        ProductDetailResponse toResponse(ProductDetail entity);
 
-    ProductDetailResponse toResponse(ProductDetail entity);
+        List<ProductDetailResponse> toResponseList(List<ProductDetail> entities);
 
-    List<ProductDetailResponse> toResponseList(List<ProductDetail> entities);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromDto(ProductDetailRequest dto, @MappingTarget ProductDetail entity);
+        @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        @Mapping(target = "product", ignore = true)
+        @Mapping(target = "configuration", ignore = true)
+        void updateEntityFromDto(ProductDetailRequest dto, @MappingTarget ProductDetail entity);
 }

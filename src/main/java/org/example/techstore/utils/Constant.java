@@ -30,6 +30,7 @@ public class Constant {
         public static final String BRAND = "Nhãn hàng";
         public static final String ACCOUNT = "Người dùng";
         public static final Object PRODUCT = "Sản phẩm";
+        public static final Object PRODUCT_DETAIL = "Sản phẩm";
 
     }
 }
