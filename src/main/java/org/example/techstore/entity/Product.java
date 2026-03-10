@@ -3,6 +3,8 @@ package org.example.techstore.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.example.techstore.config.AutoCodeListener;
+import org.example.techstore.config.AutoGenerateCode;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@EntityListeners(AutoCodeListener.class)
 public class Product extends BaseEntity {
 
     @Id
@@ -21,6 +24,7 @@ public class Product extends BaseEntity {
     private Long id;
 
     @Column(name = "product_code", unique = true, nullable = false, length = 6)
+    @AutoGenerateCode(prefix = "PR_", length = 8)
     private String productCode;
 
     @Column(nullable = false)

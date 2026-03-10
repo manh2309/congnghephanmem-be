@@ -19,7 +19,7 @@ public class Brand extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @AutoGenerateCode(prefix = "BR-", length = 8)
+    @AutoGenerateCode(prefix = "BR_", length = 8)
     private String brandCode;
     @Column(nullable = false)
     private String name;

@@ -15,6 +15,7 @@ public interface ProductMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "modifiedBy", ignore = true)
     @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "productCode", ignore = true)
     Product toEntity(ProductRequest dto);
 
     ProductResponse toResponse(Product entity);

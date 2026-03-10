@@ -16,6 +16,7 @@ public interface BrandMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "modifiedBy", ignore = true)
     @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "brandCode", ignore = true)
     Brand toEntity(BrandRequest dto);
 
     BrandResponse toResponse(Brand entity);

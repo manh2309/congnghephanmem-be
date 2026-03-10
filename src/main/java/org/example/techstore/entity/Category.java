@@ -20,7 +20,7 @@ public class Category extends BaseEntity {
     private Long id;
 
     @Column(name = "category_code")
-    @AutoGenerateCode(prefix = "CT-", length = 8)
+    @AutoGenerateCode(prefix = "CT_", length = 8)
     private String categoryCode;
 
     @Column(nullable = false)
