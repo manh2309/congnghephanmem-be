@@ -32,5 +32,7 @@ public class Constant {
         public static final Object PRODUCT = "Sản phẩm";
         public static final Object PRODUCT_DETAIL = "Sản phẩm";
 
+        public static final Object SPECIFICATION = "Thông số";
+        public static final Object CONFIGURATION = "Cấu hình";
     }
 }

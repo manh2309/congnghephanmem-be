@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SpecificationRepository extends JpaRepository<Specification, Long> , JpaSpecificationExecutor<Specification> {
+public interface SpecificationRepository extends JpaRepository<Specification, Long>, JpaSpecificationExecutor<Specification> {
 
     @Query(value = "SELECT * FROM specifications", nativeQuery = true)
     List<Specification> findAllIncludingDeleted();

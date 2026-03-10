@@ -13,5 +13,5 @@ public class SpecificationRequest {
     private String specificationCode;
     private String name;
     private String value;
-    private Configuration configuration;
+    private Long configurationId;
 }

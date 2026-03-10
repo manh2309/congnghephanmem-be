@@ -1,6 +1,7 @@
 package org.example.techstore.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.response.ApiResponse;
@@ -10,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
+@Tag(name = "Product-Detail", description = "CRUD API cho Product-Detail (Soft Delete + Restore)")
 @RestController
 @RequestMapping("/api/product-details")
 @RequiredArgsConstructor
