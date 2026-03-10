@@ -26,6 +26,9 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
     @Query(value = "SELECT * FROM product_details WHERE id = :id", nativeQuery = true)
     Optional<ProductDetail> findByIdIncludingDeleted(@Param("id") Long id);
 
+
+    Optional<ProductDetail> findByProductIdAndConfigurationIdAndIsActiveTrue(Long productId, Long configurationId);
+
     List<ProductDetail> findByProductId(Long productId);
 
     List<ProductDetail> findByProductIdAndIsActiveTrue(Long productId);

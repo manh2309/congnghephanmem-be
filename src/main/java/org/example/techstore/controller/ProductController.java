@@ -43,7 +43,7 @@ public class ProductController {
             sort = "id",
             direction = Sort.Direction.ASC
     )
-                                                      Pageable pageable) {
+    Pageable pageable) {
         return productService.findAllIncludingDeleted(pageable);
     }
 

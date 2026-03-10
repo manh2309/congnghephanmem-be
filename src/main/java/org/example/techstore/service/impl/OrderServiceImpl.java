@@ -1,298 +1,299 @@
-//package org.example.techstore.service.impl;
-//
-//import lombok.AccessLevel;
-//import lombok.RequiredArgsConstructor;
-//import lombok.experimental.FieldDefaults;
-//import org.apache.commons.text.StringEscapeUtils;
-//import org.example.techstore.dto.request.order.OrderDetailRequest;
-//import org.example.techstore.dto.request.order.OrderRequest;
-//import org.example.techstore.dto.request.order.OrderStatusDTO;
-//import org.example.techstore.dto.response.ApiResponse;
-//import org.example.techstore.entity.Account;
-//import org.example.techstore.entity.Order;
-//import org.example.techstore.entity.OrderDetail;
-//import org.example.techstore.entity.ProductDetail;
-//import org.example.techstore.enums.OrderStatus;
-//import org.example.techstore.enums.PaymentMethod;
-//import org.example.techstore.exception.AppException;
-//import org.example.techstore.exception.StatusCode;
-//import org.example.techstore.repository.AccountRepository;
-//import org.example.techstore.repository.OrderDetailRepository;
-//import org.example.techstore.repository.OrderRepository;
-//import org.example.techstore.repository.ProductDetailRepository;
-//import org.example.techstore.service.OrderService;
-//import org.example.techstore.utils.Constant;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.math.BigDecimal;
-//import java.text.NumberFormat;
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.Locale;
-//import java.util.Random;
-//
-//@Service
-//@RequiredArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-//public class OrderServiceImpl implements OrderService {
-//    OrderRepository orderRepository;
-//    OrderDetailRepository orderDetailRepository;
-//    ProductDetailRepository productDetailRepository;
-//    TelegramService telegramService;
-//    private final AccountRepository accountRepository;
-//
-//    private String generateOrderCode() {
-//        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-//        Random random = new Random();
-//        StringBuilder code = new StringBuilder();
-//
-//        for (int i = 0; i < 12; i++) {
-//            code.append(chars.charAt(random.nextInt(chars.length())));
-//        }
-//
-//        return code.toString();
-//    }
-//
-//    @Override
-//    public ApiResponse<Object> getAllOrders() {
-//
-//        List<Order> orders = orderRepository.findAll();
-//
-//        return ApiResponse.builder()
-//                .message("Lấy danh sách đơn hàng thành công")
-//                .result(orders)
-//                .build();
-//    }
-//
-//    @Override
-//    public ApiResponse<Object> getOrderById(Long id) {
-//
-//        Order order = orderRepository.findById(id)
-//                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER))));
-//
-//        return ApiResponse.builder()
-//                .message("Lấy thông tin đơn hàng thành công")
-//                .result(order)
-//                .build();
-//    }
-//
-//    @Override
-//    public ApiResponse<Object> getOrdersByAccount(Long accountId) {
-//
-//        List<Order> orders =
-//                orderRepository.findByAccountIdNotDeleted(accountId);
-//
-//        return ApiResponse.builder()
-//                .message("Lấy danh sách đơn hàng của tài khoản thành công")
-//                .result(orders)
-//                .build();
-//    }
-//
-//    @Override
-//    @Transactional
-//    public ApiResponse<Object> createOrder(OrderRequest request) {
-//
-//        Account account = accountRepository.findById(request.getAccountId())
-//                .orElseThrow(() -> new AppException(
-//                        StatusCode.BAD_REQUEST.withMessage(
-//                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ACCOUNT)
-//                        )
-//                ));
-//
-//        Order order = new Order();
-//
-//        order.setStatus(OrderStatus.fromCode(request.getStatus()));
-//        order.setCustomerName(request.getCustomerName());
-//        order.setCustomerPhone(request.getCustomerPhone());
-//        order.setCustomerAddress(request.getCustomerAddress());
-//        order.setPaymentMethod(PaymentMethod.fromCode(request.getPaymentMethod()));
-//        order.setNote(request.getNote());
-//        order.setVat(request.getVat() == null
-//                ? BigDecimal.ZERO
-//                : BigDecimal.valueOf(request.getVat()));
-//
-//        order.setTotalPrice(BigDecimal.ZERO);
-//        order.setAccount(account);
-//        order.setCreatedDate(LocalDateTime.now());
-//
-//        Order savedOrder = orderRepository.save(order);
-//
-//        List<OrderDetailRequest> orderDetailsRequest = request.getOrderDetails();
-//
-//        BigDecimal calculatedTotal = BigDecimal.ZERO;
-//        StringBuilder productList = new StringBuilder();
-//
-//        if (orderDetailsRequest != null) {
-//
-//            for (OrderDetailRequest detailReq : orderDetailsRequest) {
-//
-//                ProductDetailRequest pdReq = detailReq.getProductDetail();
-//
-//                ProductDetail productDetail =
-//                        productDetailRepository
-//                                .findByProduct_IdAndConfiguration_Id(
-//                                        pdReq.getProductId(),
-//                                        pdReq.getConfigurationId()
-//                                )
-//                                .orElseThrow(() ->
-//                                        new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy thông tin chi tiết sản phẩm"))
-//                                );
-//
-//                OrderDetail detail = new OrderDetail();
-//
-//                detail.setOrder(savedOrder);
-//                detail.setProductDetail(productDetail);
-//                detail.setQuantity(detailReq.getQuantity());
-//                detail.setUnitPrice(detailReq.getUnitPrice());
-//
-//                orderDetailRepository.save(detail);
-//
-//                BigDecimal lineTotal =
-//                        detailReq.getUnitPrice()
-//                                .multiply(BigDecimal.valueOf(detailReq.getQuantity()));
-//
-//                calculatedTotal = calculatedTotal.add(lineTotal);
-//
-//                productList.append(productDetail.getProduct().getName())
-//                        .append("\n");
-//            }
-//        }
-//
-//        BigDecimal total = calculatedTotal.add(savedOrder.getVat());
-//
-//        savedOrder.setTotalPrice(total);
-//
-//        orderRepository.save(savedOrder);
-//
-//        sendTelegram(savedOrder, productList.toString());
-//
-//        return ApiResponse.builder()
-//                .message("Tạo đơn hàng thành công")
-//                .result(savedOrder)
-//                .build();
-//    }
-//
-//    @Override
-//    public ApiResponse<Object> patchOrder(Long id, OrderRequest request) {
-//
-//        Order order = orderRepository.findById(id)
-//                .orElseThrow(() -> new AppException(
-//                        StatusCode.BAD_REQUEST.withMessage(
-//                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER)
-//                        )
-//                ));
-//
-//        if (request.getCustomerName() != null) {
-//            order.setCustomerName(request.getCustomerName());
-//        }
-//
-//        if (request.getCustomerPhone() != null) {
-//            order.setCustomerPhone(request.getCustomerPhone());
-//        }
-//
-//        if (request.getCustomerAddress() != null) {
-//            order.setCustomerAddress(request.getCustomerAddress());
-//        }
-//
-//        if (request.getPaymentMethod() != null) {
-//            PaymentMethod method = PaymentMethod.fromCode(request.getPaymentMethod());
-//            order.setPaymentMethod(method);
-//        }
-//
-//        if (request.getNote() != null) {
-//            order.setNote(request.getNote());
-//        }
-//
-//        if (request.getStatus() != null) {
-//            OrderStatus status = OrderStatus.fromCode(request.getStatus());
-//            order.setStatus(status);
-//        }
-//
-//        orderRepository.save(order);
-//
-//        return ApiResponse.builder()
-//                .message("Cập nhật thông tin đơn hàng thành công")
-//                .result(order)
-//                .build();
-//    }
-//
-//    @Override
-//    public ApiResponse<Object> updateOrderStatus(Long id, OrderStatusDTO request) {
-//
-//        Order order = orderRepository.findById(id)
-//                .orElseThrow(() -> new AppException(
-//                        StatusCode.BAD_REQUEST.withMessage(
-//                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER)
-//                        )
-//                ));
-//
-//        OrderStatus currentStatus = order.getStatus();
-//        OrderStatus newStatus = OrderStatus.fromCode(request.getStatus());
-//
-//        boolean validTransition = switch (currentStatus) {
-//
-//            case PENDING -> (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELED);
-//
-//            case CONFIRMED -> (newStatus == OrderStatus.PENDING || newStatus == OrderStatus.SHIPPING);
-//
-//            case SHIPPING -> (newStatus == OrderStatus.DELIVERED);
-//
-//            case DELIVERED, CANCELED -> false;
-//        };
-//
-//        if (!validTransition) {
-//            throw new AppException(
-//                    StatusCode.BAD_REQUEST.withMessage("Không thể chuyển trạng thái đơn hàng không hợp lệ")
-//            );
-//        }
-//
-//        order.setStatus(newStatus);
-//
-//        orderRepository.save(order);
-//
-//        return ApiResponse.builder()
-//                .message("Cập nhật trạng thái đơn hàng thành công")
-//                .result(order)
-//                .build();
-//    }
-//
-//    private void sendTelegram(Order order, String productList) {
-//
-//        NumberFormat currencyFormat =
-//                NumberFormat.getInstance(new Locale("vi", "VN"));
-//
-//        String totalText = currencyFormat.format(order.getTotalPrice());
-//
-//        String safeNote =
-//                order.getNote() == null
-//                        ? "Không có"
-//                        : StringEscapeUtils.escapeHtml4(order.getNote());
-//
-//        String message = """
-//                🛎️ <b>ĐƠN HÀNG MỚI</b>
-//
-//                🆔 %s
-//                👤 %s
-//                📞 %s
-//                📍 %s
-//
-//                📦 <pre>%s</pre>
-//
-//                📝 <pre>%s</pre>
-//
-//                💰 %s ₫
-//                """.formatted(
-//                order.getOrderCode(),
-//                order.getCustomerName(),
-//                order.getCustomerPhone(),
-//                order.getCustomerAddress(),
-//                productList,
-//                safeNote,
-//                totalText
-//        );
-//
-//        telegramService.sendOrderMessage(message);
-//    }
-//
-//}
+package org.example.techstore.service.impl;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.apache.commons.text.StringEscapeUtils;
+import org.example.techstore.dto.request.order.OrderDetailRequest;
+import org.example.techstore.dto.request.order.OrderRequest;
+import org.example.techstore.dto.request.order.OrderStatusDTO;
+import org.example.techstore.dto.request.product.ProductDetailRequest;
+import org.example.techstore.dto.response.ApiResponse;
+import org.example.techstore.entity.Account;
+import org.example.techstore.entity.Order;
+import org.example.techstore.entity.OrderDetail;
+import org.example.techstore.entity.ProductDetail;
+import org.example.techstore.enums.OrderStatus;
+import org.example.techstore.enums.PaymentMethod;
+import org.example.techstore.exception.AppException;
+import org.example.techstore.exception.StatusCode;
+import org.example.techstore.repository.AccountRepository;
+import org.example.techstore.repository.OrderDetailRepository;
+import org.example.techstore.repository.OrderRepository;
+import org.example.techstore.repository.ProductDetailRepository;
+import org.example.techstore.service.OrderService;
+import org.example.techstore.utils.Constant;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class OrderServiceImpl implements OrderService {
+    OrderRepository orderRepository;
+    OrderDetailRepository orderDetailRepository;
+    ProductDetailRepository productDetailRepository;
+    TelegramService telegramService;
+    private final AccountRepository accountRepository;
+
+    private String generateOrderCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder code = new StringBuilder();
+
+        for (int i = 0; i < 12; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+
+        return code.toString();
+    }
+
+    @Override
+    public ApiResponse<Object> getAllOrders() {
+
+        List<Order> orders = orderRepository.findAll();
+
+        return ApiResponse.builder()
+                .message("Lấy danh sách đơn hàng thành công")
+                .result(orders)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Object> getOrderById(Long id) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER))));
+
+        return ApiResponse.builder()
+                .message("Lấy thông tin đơn hàng thành công")
+                .result(order)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Object> getOrdersByAccount(Long accountId) {
+
+        List<Order> orders =
+                orderRepository.findByAccountIdNotDeleted(accountId);
+
+        return ApiResponse.builder()
+                .message("Lấy danh sách đơn hàng của tài khoản thành công")
+                .result(orders)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ApiResponse<Object> createOrder(OrderRequest request) {
+
+        Account account = accountRepository.findById(request.getAccountId())
+                .orElseThrow(() -> new AppException(
+                        StatusCode.BAD_REQUEST.withMessage(
+                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ACCOUNT)
+                        )
+                ));
+
+        Order order = new Order();
+
+        order.setStatus(OrderStatus.fromCode(request.getStatus()));
+        order.setCustomerName(request.getCustomerName());
+        order.setCustomerPhone(request.getCustomerPhone());
+        order.setCustomerAddress(request.getCustomerAddress());
+        order.setPaymentMethod(PaymentMethod.fromCode(request.getPaymentMethod()));
+        order.setNote(request.getNote());
+        order.setVat(request.getVat() == null
+                ? BigDecimal.ZERO
+                : BigDecimal.valueOf(request.getVat()));
+
+        order.setTotalPrice(BigDecimal.ZERO);
+        order.setAccount(account);
+        order.setCreatedDate(LocalDateTime.now());
+
+        Order savedOrder = orderRepository.save(order);
+
+        List<OrderDetailRequest> orderDetailsRequest = request.getOrderDetails();
+
+        BigDecimal calculatedTotal = BigDecimal.ZERO;
+        StringBuilder productList = new StringBuilder();
+
+        if (orderDetailsRequest != null) {
+
+            for (OrderDetailRequest detailReq : orderDetailsRequest) {
+
+                ProductDetailRequest pdReq = detailReq.getProductDetail();
+
+                ProductDetail productDetail =
+                        productDetailRepository
+                                .findByProductIdAndConfigurationIdAndIsActiveTrue(
+                                        pdReq.getProductId(),
+                                        pdReq.getConfigurationId()
+                                )
+                                .orElseThrow(() ->
+                                        new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy thông tin chi tiết sản phẩm"))
+                                );
+
+                OrderDetail detail = new OrderDetail();
+
+                detail.setOrder(savedOrder);
+                detail.setProductDetail(productDetail);
+                detail.setQuantity(detailReq.getQuantity());
+                detail.setUnitPrice(detailReq.getUnitPrice());
+
+                orderDetailRepository.save(detail);
+
+                BigDecimal lineTotal =
+                        detailReq.getUnitPrice()
+                                .multiply(BigDecimal.valueOf(detailReq.getQuantity()));
+
+                calculatedTotal = calculatedTotal.add(lineTotal);
+
+                productList.append(productDetail.getProduct().getName())
+                        .append("\n");
+            }
+        }
+
+        BigDecimal total = calculatedTotal.add(savedOrder.getVat());
+
+        savedOrder.setTotalPrice(total);
+
+        orderRepository.save(savedOrder);
+
+        sendTelegram(savedOrder, productList.toString());
+
+        return ApiResponse.builder()
+                .message("Tạo đơn hàng thành công")
+                .result(savedOrder)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Object> patchOrder(Long id, OrderRequest request) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(
+                        StatusCode.BAD_REQUEST.withMessage(
+                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER)
+                        )
+                ));
+
+        if (request.getCustomerName() != null) {
+            order.setCustomerName(request.getCustomerName());
+        }
+
+        if (request.getCustomerPhone() != null) {
+            order.setCustomerPhone(request.getCustomerPhone());
+        }
+
+        if (request.getCustomerAddress() != null) {
+            order.setCustomerAddress(request.getCustomerAddress());
+        }
+
+        if (request.getPaymentMethod() != null) {
+            PaymentMethod method = PaymentMethod.fromCode(request.getPaymentMethod());
+            order.setPaymentMethod(method);
+        }
+
+        if (request.getNote() != null) {
+            order.setNote(request.getNote());
+        }
+
+        if (request.getStatus() != null) {
+            OrderStatus status = OrderStatus.fromCode(request.getStatus());
+            order.setStatus(status);
+        }
+
+        orderRepository.save(order);
+
+        return ApiResponse.builder()
+                .message("Cập nhật thông tin đơn hàng thành công")
+                .result(order)
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Object> updateOrderStatus(Long id, OrderStatusDTO request) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(
+                        StatusCode.BAD_REQUEST.withMessage(
+                                String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ORDER)
+                        )
+                ));
+
+        OrderStatus currentStatus = order.getStatus();
+        OrderStatus newStatus = OrderStatus.fromCode(request.getStatus());
+
+        boolean validTransition = switch (currentStatus) {
+
+            case PENDING -> (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELED);
+
+            case CONFIRMED -> (newStatus == OrderStatus.PENDING || newStatus == OrderStatus.SHIPPING);
+
+            case SHIPPING -> (newStatus == OrderStatus.DELIVERED);
+
+            case DELIVERED, CANCELED -> false;
+        };
+
+        if (!validTransition) {
+            throw new AppException(
+                    StatusCode.BAD_REQUEST.withMessage("Không thể chuyển trạng thái đơn hàng không hợp lệ")
+            );
+        }
+
+        order.setStatus(newStatus);
+
+        orderRepository.save(order);
+
+        return ApiResponse.builder()
+                .message("Cập nhật trạng thái đơn hàng thành công")
+                .result(order)
+                .build();
+    }
+
+    private void sendTelegram(Order order, String productList) {
+
+        NumberFormat currencyFormat =
+                NumberFormat.getInstance(new Locale("vi", "VN"));
+
+        String totalText = currencyFormat.format(order.getTotalPrice());
+
+        String safeNote =
+                order.getNote() == null
+                        ? "Không có"
+                        : StringEscapeUtils.escapeHtml4(order.getNote());
+
+        String message = """
+                🛎️ <b>ĐƠN HÀNG MỚI</b>
+
+                🆔 %s
+                👤 %s
+                📞 %s
+                📍 %s
+
+                📦 <pre>%s</pre>
+
+                📝 <pre>%s</pre>
+
+                💰 %s ₫
+                """.formatted(
+                order.getOrderCode(),
+                order.getCustomerName(),
+                order.getCustomerPhone(),
+                order.getCustomerAddress(),
+                productList,
+                safeNote,
+                totalText
+        );
+
+        telegramService.sendOrderMessage(message);
+    }
+
+}

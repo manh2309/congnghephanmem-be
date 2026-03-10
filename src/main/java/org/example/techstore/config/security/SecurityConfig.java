@@ -96,8 +96,30 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PATCH, "/api/categories/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.DELETE, "/api/categories/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/categories/{id}/restore").hasRole("ADMIN")
+                                // PRODUCT
+                                .requestMatchers(HttpMethod.GET, "/api/products/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/products/{id}/restore").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/products").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/products/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/products/{id}").hasAnyRole("ADMIN", "STAFF")
 
-// CONFIGURATIONS
+                                // PRODUCT DETAIL
+                                .requestMatchers(HttpMethod.GET, "/api/product-details/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/product-details/{id}/restore").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/product-details", "/api/product-details/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/product-details").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/product-details/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/product-details/{id}").hasAnyRole("ADMIN", "STAFF")
+
+                                // SPECIFICATION
+                                .requestMatchers(HttpMethod.GET, "/api/specifications/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/specifications/{id}/restore").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/specifications", "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/specifications").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF")
+                                // CONFIGURATIONS
                                 .requestMatchers(HttpMethod.GET, "/api/configurations").hasAnyRole("ADMIN", "STAFF", "USER")
                                 .requestMatchers(HttpMethod.GET, "/api/configurations/all").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.GET, "/api/configurations/deleted").hasAnyRole("ADMIN", "STAFF")
