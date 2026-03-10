@@ -2,22 +2,28 @@ package org.example.techstore.repository;
 
 import org.example.techstore.entity.OrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
-//    @Query("SELECT OrderDetail FROM OrderDetail WHERE deletedAt IS NULL")
-//    List<OrderDetail> findAllNotDeleted();
-//
-//    @Query("SELECT OrderDetail FROM OrderDetail")
-//    List<OrderDetail> findAllIncludingDeleted();
-//
-//    @Query("SELECT OrderDetail FROM OrderDetail WHERE id = :id AND deletedAt IS NULL")
-//    OrderDetail findNotDeletedById(Long id);
-//
-//    @Query("SELECT OrderDetail FROM OrderDetail WHERE id = :id")
-//    OrderDetail findAnyById(Long id);
-//
-//    Optional<OrderDetail> findByProductDetail_Product_IdAndProductDetail_Configuration_Id(Long productId, Long configurationId);
+    @Query("SELECT od FROM OrderDetail od WHERE od.isActive = 1")
+    List<OrderDetail> findAllNotDeleted();
 
+    @Query("SELECT od FROM OrderDetail od")
+    List<OrderDetail> findAllIncludingDeleted();
+
+    @Query("SELECT od FROM OrderDetail od WHERE od.id = :id AND od.isActive = 1")
+    OrderDetail findNotDeletedById(Long id);
+
+    @Query("SELECT od FROM OrderDetail od WHERE od.id = :id")
+    OrderDetail findAnyById(Long id);
+
+    Optional<OrderDetail> findByProductDetail_Product_IdAndProductDetail_Configuration_Id(
+            Long productId,
+            Long configurationId
+    );
 }

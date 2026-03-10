@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         CustomUserDetails userDetails = new CustomUserDetails(
                 username,
                 "",
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)),
+                Collections.singletonList(new SimpleGrantedAuthority(role)),
                 accountId
         );
 

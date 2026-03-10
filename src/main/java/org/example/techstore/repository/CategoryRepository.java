@@ -11,28 +11,15 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    // Lấy tất cả category chưa bị xoá (deleted_at IS NULL)
-    @Query(value = "SELECT * FROM categories WHERE deleted_at IS NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM categories WHERE is_active = 1", nativeQuery = true)
     List<Category> findAllActive();
 
-    // Lấy tất cả category kể cả đã xoá
     @Query(value = "SELECT * FROM categories", nativeQuery = true)
     List<Category> findAllIncludingDeleted();
 
-    // Tìm 1 category theo id (chỉ lấy cái chưa bị xoá)
-    @Query(value = "SELECT * FROM categories WHERE id = :id AND deleted_at IS NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM categories WHERE id = :id AND is_active = 1", nativeQuery = true)
     Optional<Category> findActiveById(@Param("id") Long id);
 
-    // Tìm 1 category theo id (kể cả đã xoá)
-    @Query(value = "SELECT * FROM categories WHERE id = :id", nativeQuery = true)
-    Optional<Category> findByIdIncludingDeleted(@Param("id") Long id);
-
-    @Query(value = "SELECT * FROM categories WHERE name = :name LIMIT 1", nativeQuery = true)
-    Optional<Category> findByNameIncludingDeleted(@Param("name") String name);
-
-    // 🔍 Tìm category đang hoạt động theo tên
-    @Query(value = "SELECT * FROM categories WHERE name = :name AND deleted_at IS NULL LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM categories WHERE name = :name AND is_active = 1 LIMIT 1", nativeQuery = true)
     Optional<Category> findByNameActive(@Param("name") String name);
-
-    Optional<Category> findByNameIgnoreCase(String name);
 }

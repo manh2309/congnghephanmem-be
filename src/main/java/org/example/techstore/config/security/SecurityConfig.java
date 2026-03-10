@@ -1,6 +1,5 @@
 package org.example.techstore.config.security;
 
-import com.cloudinary.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,33 +43,81 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->  auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/brands/all").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.PUT, "/api/brands/{id}/restore").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/brands").hasAnyRole("ADMIN", "STAFF", "USER")
-                        .requestMatchers(HttpMethod.GET, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/brands").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.PUT, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.DELETE, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.GET, "/api/roles/all").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/roles/{id}/restore").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/roles").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.GET, "/api/roles/{id}").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.POST, "/api/roles").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/roles/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/images").hasAnyRole("ADMIN", "STAFF", "USER")
-                        .requestMatchers(HttpMethod.GET, "/api/images/product/{productId}").hasAnyRole("ADMIN", "STAFF", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/images/upload").hasAnyRole("ADMIN", "STAFF")
-                        .requestMatchers(HttpMethod.DELETE, "/api/images/{id}").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(PUBLIC_URLS).permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/brands/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/brands/{id}/restore").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/brands").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/brands").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/brands/{id}").hasAnyRole("ADMIN", "STAFF")
+                                // ROLE
+                                .requestMatchers(HttpMethod.GET, "/api/roles/all").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/roles/{id}/restore").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/roles").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/roles/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.POST, "/api/roles").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/api/roles/{id}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/roles/{id}").hasRole("ADMIN")
+                                // IMAGE
+                                .requestMatchers(HttpMethod.GET, "/api/images").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/images/product/{productId}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/images/upload").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/images/{id}").hasRole("ADMIN")
+                                // ACCOUNT
+                                .requestMatchers(HttpMethod.GET, "/api/accounts/", "/api/accounts/statistics", "/api/accounts/all").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/accounts").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.PATCH, "/api/accounts/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.DELETE, "/api/accounts/{id}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/accounts/{id}/restore").hasRole("ADMIN")
+                                // ORDER
+                                .requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/orders/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/orders/account/{accountId}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
+                                .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}/status").hasAnyRole("ADMIN", "STAFF")
+                                //ORDER_DETAIL
+                                .requestMatchers(HttpMethod.GET, "/api/order-details").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/order-details/all").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/order-details/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/order-details/{id}/any").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/order-details").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PATCH, "/api/order-details/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/order-details/{id}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/order-details/{id}/restore").hasRole("ADMIN")
+                                // CATEGORY
+                                .requestMatchers(HttpMethod.GET, "/api/categories").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/categories/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/categories/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/categories/{id}/any").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/categories").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PATCH, "/api/categories/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/categories/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/categories/{id}/restore").hasRole("ADMIN")
+
+// CONFIGURATIONS
+                                .requestMatchers(HttpMethod.GET, "/api/configurations").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/configurations/all").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/configurations/deleted").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.GET, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/configurations/any/{id}").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/configurations").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PATCH, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.DELETE, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PUT, "/api/configurations/{id}/restore").hasRole("ADMIN")
+                                .anyRequest().authenticated()
                 )
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess ->
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
-                                                .accessDeniedHandler(customAccessDeniedHandler));
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                );
         return http.build();
     }
 

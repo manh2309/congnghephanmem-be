@@ -2,6 +2,8 @@ package org.example.techstore.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.techstore.dto.response.ApiResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,5 +54,18 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(statusCode.getHttpStatusCode()).body(apiResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDuplicateKey(DataIntegrityViolationException e) {
+        // Log lỗi để mình biết là có trùng thật
+        log.error("Duplicate Key: {}", e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.builder()
+                        .code(400)
+                        .message("Mã hệ thống bị trùng lặp hoặc dữ liệu đã tồn tại, vui lòng thử lại!")
+                        .build()
+        );
     }
 }

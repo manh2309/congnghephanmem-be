@@ -25,3 +25,8 @@ application:
     expiration: 900000  # 15 phút
     refresh-token:
       expiration: 604800000  # 7 ng?y
+telegram:
+  bot:
+    token: 7696077044:AAELvKNUECYUxG6vXGH0p2zvLZH8MhXpxBw
+  chat:
+    id: 6999594920

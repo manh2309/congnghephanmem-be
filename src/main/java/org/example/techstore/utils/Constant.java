@@ -33,6 +33,7 @@ public class Constant {
         public static final String IMAGE = "Hình ảnh";
         public static final String ACCOUNT = "Người dùng";
         public static final String PRODUCT = "Sản phẩm";
+        public static final String ORDER = "Đơn hàng";
 
     }
 }

@@ -39,4 +39,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     """)
     Long sumTotalPriceByAccountId(@Param("accountId") Long accountId);
 
+    @Query("""
+    SELECT o FROM Order o
+    WHERE o.account.id = :accountId
+      AND o.isActive = 1
+    ORDER BY o.createdDate DESC
+""")
+    List<Order> findByAccountIdNotDeleted(@Param("accountId") Long userId);
 }

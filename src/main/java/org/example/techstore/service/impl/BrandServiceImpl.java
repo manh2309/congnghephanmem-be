@@ -83,8 +83,9 @@ public class BrandServiceImpl implements BrandService {
     @Transactional
     @Override
     public ApiResponse<Object> save(BrandRequest request) {
-        if(brandRepository.existsByBrandCode(request.getBrandCode())) {
-            throw new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.EXISTS_FOUND, Constant.MODULE.BRAND)));
+        // 1. Chỉ cần check theo tên nếu cần thiết (ví dụ không cho trùng tên Brand)
+        if(brandRepository.existsByName(request.getName())) {
+            throw new AppException(StatusCode.BAD_REQUEST.withMessage("Tên thương hiệu đã tồn tại"));
         }
         Brand brand = brandMapper.toEntity(request);
         brandRepository.save(brand);

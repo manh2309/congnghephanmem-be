@@ -16,7 +16,7 @@ public interface BrandRepository extends JpaRepository<Brand, Long>, JpaSpecific
     @Query(value = "SELECT b FROM Brand b WHERE b.isActive = 1")
     Optional<Brand> findById(Long id);
 
-    boolean existsByBrandCode(String brandCode);
+    boolean existsByName(String brandName);
     // Tìm theo id (kể cả đã xoá)
     @Query(value = "SELECT * FROM brands WHERE id = :id", nativeQuery = true)
     Optional<Brand> findByIdIncludingDeleted(Long id);
