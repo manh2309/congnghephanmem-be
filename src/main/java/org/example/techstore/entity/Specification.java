@@ -1,5 +1,6 @@
 package org.example.techstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -29,6 +30,7 @@ public class Specification extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "configuration_id", nullable = false)
+    @JsonBackReference
     private Configuration configuration;
 
 }
