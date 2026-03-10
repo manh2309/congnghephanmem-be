@@ -5,6 +5,8 @@ import org.example.techstore.dto.request.specifications.SpecificationRequest;
 import org.example.techstore.dto.response.ApiResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface SpecificationService {
     ApiResponse<Object> findAll(String searchKey, Pageable pageable);
 
@@ -18,4 +20,6 @@ public interface SpecificationService {
     ApiResponse<Object>  softDelete(Long id);
 
     ApiResponse<Object>  restore(Long id);
+
+    ApiResponse<Object>  getByConfigurationId(Long configurationId, boolean includeDeleted);
 }

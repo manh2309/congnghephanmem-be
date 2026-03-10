@@ -115,7 +115,7 @@ public class SecurityConfig {
                                 // SPECIFICATION
                                 .requestMatchers(HttpMethod.GET, "/api/specifications/all").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/specifications/{id}/restore").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/api/specifications", "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
+                                .requestMatchers(HttpMethod.GET, "/api/specifications", "/api/specifications/{id}", "/api/specifications/configuration/{configurationId}").hasAnyRole("ADMIN", "STAFF", "USER")
                                 .requestMatchers(HttpMethod.POST, "/api/specifications").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.DELETE, "/api/specifications/{id}").hasAnyRole("ADMIN", "STAFF")

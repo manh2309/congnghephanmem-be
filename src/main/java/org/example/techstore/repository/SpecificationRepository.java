@@ -27,4 +27,9 @@ public interface SpecificationRepository extends JpaRepository<Specification, Lo
 
     Optional<Specification> findByNameIgnoreCase(String name);
 
+    @Query("SELECT s FROM Specification s WHERE s.configuration.id = :configurationId")
+    List<Specification> findAllByConfigurationIdIncludingDeleted(Long configurationId);
+
+    @Query("SELECT s FROM Specification s WHERE s.configuration.id = :configurationId AND s.isActive = 1")
+    List<Specification> findByConfigurationId(Long configurationId);
 }

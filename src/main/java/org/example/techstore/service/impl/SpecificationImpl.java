@@ -194,4 +194,16 @@ public class SpecificationImpl implements SpecificationService {
                 .result(null)
                 .build();
     }
+
+    @Override
+    public ApiResponse<Object> getByConfigurationId(Long configurationId, boolean includeDeleted) {
+        List<Specification> result = includeDeleted
+                ? specificationRepository.findAllByConfigurationIdIncludingDeleted(configurationId)
+                : specificationRepository.findByConfigurationId(configurationId);
+        return ApiResponse.builder()
+                .code(StatusCode.SUCCESS.getCode())
+                .message(String.format(Constant.MESSAGE.SEARCH_SUCCESS, Constant.MODULE.SPECIFICATION))
+                .result(result)
+                .build();
+    }
 }

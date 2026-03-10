@@ -5,11 +5,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.techstore.dto.request.specifications.SpecificationRequest;
 import org.example.techstore.dto.response.ApiResponse;
+import org.example.techstore.entity.Specification;
 import org.example.techstore.service.SpecificationService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Specification", description = "CRUD API cho Specification (Soft Delete + Restore)")
 @RestController
@@ -79,5 +83,12 @@ public class SpecificationController {
     @Operation(summary = "Khôi phục specification")
     public ApiResponse<Object> restoreSpecification(@PathVariable Long id) {
         return specificationService.restore(id);
+    }
+
+    @GetMapping("/configuration/{configurationId}")
+    @Operation(summary = "Lấy Specification theo Configuration Id", description = "Lấy Specification theo Configuration Id")
+    public ApiResponse<Object> getByConfiguration(@PathVariable Long configurationId,
+                                                                  @RequestParam(defaultValue = "false") boolean includeDeleted) {
+        return specificationService.getByConfigurationId(configurationId, includeDeleted);
     }
 }
