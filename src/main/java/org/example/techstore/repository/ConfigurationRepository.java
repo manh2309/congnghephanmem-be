@@ -17,7 +17,7 @@ public interface ConfigurationRepository extends JpaRepository<Configuration, Lo
     @Query(value = "SELECT b FROM Configuration b WHERE b.isActive = 0")
     List<Configuration> findByIsActiveFalse();
 
-    // Tìm 1 bản ghi đang active
+    @Query(value = "SELECT b FROM Configuration b WHERE b.isActive = 1")
     Optional<Configuration> findByIdAndIsActiveTrue(Long id);
 
     // Dùng để check trùng tên khi tạo mới
