@@ -34,6 +34,9 @@ public class Constant {
         public static final String ACCOUNT = "Người dùng";
         public static final String PRODUCT = "Sản phẩm";
         public static final String ORDER = "Đơn hàng";
+        public static final Object PRODUCT_DETAIL = "Sản phẩm";
 
+        public static final Object SPECIFICATION = "Thông số";
+        public static final Object CONFIGURATION = "Cấu hình";
     }
 }

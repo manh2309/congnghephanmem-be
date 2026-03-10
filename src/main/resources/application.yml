@@ -2,9 +2,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/tech-store
+    url: jdbc:mysql://localhost:3306/qlsaledt
     username: root
-    password: ${DB_PASSWORD}
+    password: truc
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true

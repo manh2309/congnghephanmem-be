@@ -30,5 +30,6 @@ public class Specification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "configuration_id", nullable = false)
     private Configuration configuration;
+
 }
 
