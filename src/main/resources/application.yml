@@ -30,3 +30,7 @@ telegram:
     token: 7696077044:AAELvKNUECYUxG6vXGH0p2zvLZH8MhXpxBw
   chat:
     id: 6999594920
+gemini:
+  api:
+    key: ${KEY_GEMINI}
+    url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"

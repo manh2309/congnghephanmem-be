@@ -3,8 +3,10 @@ package org.example.techstore.repository;
 import org.example.techstore.entity.OrderDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +28,14 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
             Long productId,
             Long configurationId
     );
+
+    @Query("SELECT p.name, SUM(od.quantity) " +
+            "FROM OrderDetail od " +
+            "JOIN od.order o " +
+            "JOIN od.productDetail pd " +
+            "JOIN pd.product p " +
+            "WHERE o.createdDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY p.name")
+    List<Object[]> getSalesByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
 }

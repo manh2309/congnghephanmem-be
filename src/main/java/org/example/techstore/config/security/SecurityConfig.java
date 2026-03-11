@@ -129,6 +129,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PATCH, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.DELETE, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/configurations/{id}/restore").hasRole("ADMIN")
+                                //AI
+                                .requestMatchers(HttpMethod.GET, "/api/analytics/smart-inventory").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess ->
