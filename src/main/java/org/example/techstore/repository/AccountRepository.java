@@ -14,16 +14,17 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByUsername(String username);
 
     // Lấy tất cả user kể cả đã xoá
-    @Query(value = "SELECT * FROM users", nativeQuery = true)
+    @Query(value = "SELECT * FROM accounts", nativeQuery = true)
     List<Account> findAllIncludingDeleted();
 
     // Lấy user theo id kể cả đã xoá
-    @Query(value = "SELECT * FROM users WHERE id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM accounts WHERE id = ?1", nativeQuery = true)
     Optional<Account> findByIdIncludingDeleted(Long id);
 
 //    Optional<Account> findByUsernameAndDeletedAtIsNull(String username);
 
     List<Account> findByRole_Id(Long roleId);
 
+    @Query(value = "SELECT a FROM Account a where a.isActive = 1")
     List<Account> findByIsActiveTrue();
 }

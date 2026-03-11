@@ -99,12 +99,12 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new AppException(
-                        StatusCode.BAD_REQUEST.withMessage("Product not found")
+                        StatusCode.BAD_REQUEST.withMessage("Không tìm thấy sản phẩm")
                 ));
 
         Configuration configuration = configurationRepository.findById(request.getConfigurationId())
                 .orElseThrow(() -> new AppException(
-                        StatusCode.BAD_REQUEST.withMessage("Configuration not found")
+                        StatusCode.BAD_REQUEST.withMessage("Không tìm thấy cấu hình")
                 ));
 
         ProductDetail productDetail = productDetailMapper.toEntity(request);
@@ -153,12 +153,12 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
         Product product = productRepository.findById(updatedProduct.getProductId())
                 .orElseThrow(() -> new AppException(
-                        StatusCode.BAD_REQUEST.withMessage("Product not found")
+                        StatusCode.BAD_REQUEST.withMessage("Không tìm thấy sản phẩm")
                 ));
 
         Configuration configuration = configurationRepository.findById(updatedProduct.getConfigurationId())
                 .orElseThrow(() -> new AppException(
-                        StatusCode.BAD_REQUEST.withMessage("Configuration not found")
+                        StatusCode.BAD_REQUEST.withMessage("Không tìm thấy cấu hình")
                 ));
 
         productDetailMapper.updateEntityFromDto(updatedProduct, productDetail);

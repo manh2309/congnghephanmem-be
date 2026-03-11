@@ -4,19 +4,19 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.request.product.ProductRequest;
 import org.example.techstore.dto.response.ApiResponse;
 import org.example.techstore.dto.response.BrandResponse;
 import org.example.techstore.dto.response.MetaResponse;
 import org.example.techstore.dto.response.ProductResponse;
-import org.example.techstore.entity.Brand;
-import org.example.techstore.entity.Product;
+import org.example.techstore.entity.*;
 import org.example.techstore.exception.AppException;
 import org.example.techstore.exception.StatusCode;
 import org.example.techstore.mapper.BrandMapper;
 import org.example.techstore.mapper.ProductMapper;
-import org.example.techstore.repository.BrandRepository;
-import org.example.techstore.repository.ProductRepository;
+import org.example.techstore.repository.*;
+import org.example.techstore.service.ProductDetailService;
 import org.example.techstore.service.ProductService;
 import org.example.techstore.specification.ProductSpecification;
 import org.example.techstore.utils.Constant;
@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,7 +33,11 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     ProductRepository productRepository;
+    BrandRepository brandRepository;
+    CategoryRepository categoryRepository;
     ProductMapper productMapper;
+    ProductDetailRepository productDetailRepository;
+    ConfigurationRepository configurationRepository;
 
     @Override
     public ApiResponse<Object> findAll(String searchKey, Pageable pageable) {
@@ -86,12 +91,38 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ApiResponse<Object> save(ProductRequest request) {
         if(productRepository.existsByProductCode(request.getProductCode())) {
             throw new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.EXISTS_FOUND, Constant.MODULE.PRODUCT)));
         }
         Product product = productMapper.toEntity(request);
-        productRepository.save(product);
+
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy thương hiệu")));
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy danh mục")));
+
+        product.setBrand(brand);
+        product.setCategory(category);
+
+        Product savedProduct = productRepository.saveAndFlush(product);
+
+        if (request.getProductDetails() != null) {
+            List<ProductDetail> listDetails = new ArrayList<>();
+            for (ProductDetailRequest detailReq : request.getProductDetails()) {
+                Configuration config = configurationRepository.findById(detailReq.getConfigurationId())
+                        .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy cấu hình")));
+
+                ProductDetail detail = new ProductDetail();
+                detail.setProduct(savedProduct);
+                detail.setConfiguration(config);
+                detail.setQuantity(detailReq.getQuantity());
+                detail.setPrice(detailReq.getPrice());
+                listDetails.add(detail);
+            }
+            productDetailRepository.saveAll(listDetails);
+        }
 
         return ApiResponse.builder()
                 .code(StatusCode.SUCCESS.getCode())
@@ -117,6 +148,13 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id).orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.PRODUCT))));
 
         productMapper.updateEntityFromDto(updatedProduct, product);
+        Brand brand = brandRepository.findById(updatedProduct.getBrandId())
+                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy thương hiệu")));
+        Category category = categoryRepository.findById(updatedProduct.getCategoryId())
+                .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy danh mục")));
+
+        product.setBrand(brand);
+        product.setCategory(category);
         productRepository.save(product);
         return ApiResponse.builder()
                 .code(StatusCode.SUCCESS.getCode())
