@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
         Optional<Product> findActiveById(Long id);
 
-        boolean existsByProductCode(String productCode);
+        boolean existsByName(String productName);
 
         @Query(value = "SELECT * FROM products WHERE id = :id", nativeQuery = true)
         Optional<Product> findByIdIncludingDeleted(Long id);

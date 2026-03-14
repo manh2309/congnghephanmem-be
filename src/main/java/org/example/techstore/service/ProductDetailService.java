@@ -4,6 +4,8 @@ import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.response.ApiResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProductDetailService {
 
     ApiResponse<Object> findAll(String searchKey, Pageable pageable);
@@ -19,4 +21,6 @@ public interface ProductDetailService {
     ApiResponse<Object> softDelete(Long id);
 
     ApiResponse<Object> restore(Long id);
+
+    ApiResponse<Object> getByProductId(Long productId);
 }

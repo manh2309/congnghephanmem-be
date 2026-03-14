@@ -217,4 +217,13 @@ public class ProductDetailServiceImpl implements ProductDetailService {
                 .build();
     }
 
+    @Override
+    public ApiResponse<Object> getByProductId(Long productId) {
+        return ApiResponse.builder()
+                .code(StatusCode.SUCCESS.getCode())
+                .message(String.format(Constant.MESSAGE.RESTORE_SUCCESS, Constant.MODULE.PRODUCT_DETAIL))
+                .result(productDetailRepository.findByProductId(productId))
+                .build();
+    }
+
 }

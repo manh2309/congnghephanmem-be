@@ -13,11 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class ProductRequest {
-    private String productCode;
     private String name;
     private Integer totalQuantity;
     private Long brandId;
     private Long categoryId;
     private String description;
-    private List<ProductDetailRequest> productDetails;
+    private List<ProductDetailCreateRequest> productDetails;
 }

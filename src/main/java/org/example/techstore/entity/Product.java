@@ -24,7 +24,7 @@ public class Product extends BaseEntity {
     private Long id;
 
     @Column(name = "product_code", unique = true, nullable = false, length = 6)
-    @AutoGenerateCode(prefix = "PR_", length = 8)
+    @AutoGenerateCode(prefix = "PR_", length = 3)
     private String productCode;
 
     @Column(nullable = false)

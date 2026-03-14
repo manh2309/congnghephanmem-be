@@ -5,11 +5,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.response.ApiResponse;
+import org.example.techstore.dto.response.ProductDetailResponse;
 import org.example.techstore.service.ProductDetailService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 @Tag(name = "Product-Detail", description = "CRUD API cho Product-Detail (Soft Delete + Restore)")
 @RestController
@@ -79,5 +83,11 @@ public class ProductDetailController {
     @Operation(summary = "Khôi phục product detail")
     public ApiResponse<Object> restoreProductDetail(@PathVariable Long id) {
         return productDetailService.restore(id);
+    }
+
+    @GetMapping("/product/{productId}")
+    @Operation(summary = "Lấy danh sách Product Detail theo productId", description = "Chỉ lấy các Product Detail chưa bị xoá mềm của product cụ thể")
+    public ApiResponse<Object> getByProductId(@PathVariable Long productId) {
+        return productDetailService.getByProductId(productId);
     }
 }

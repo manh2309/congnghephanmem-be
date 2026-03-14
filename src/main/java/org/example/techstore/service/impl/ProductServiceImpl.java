@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.techstore.dto.request.product.ProductDetailCreateRequest;
 import org.example.techstore.dto.request.product.ProductDetailRequest;
 import org.example.techstore.dto.request.product.ProductRequest;
 import org.example.techstore.dto.response.ApiResponse;
@@ -93,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ApiResponse<Object> save(ProductRequest request) {
-        if(productRepository.existsByProductCode(request.getProductCode())) {
+        if(productRepository.existsByName(request.getName())) {
             throw new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.EXISTS_FOUND, Constant.MODULE.PRODUCT)));
         }
         Product product = productMapper.toEntity(request);
@@ -110,7 +111,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (request.getProductDetails() != null) {
             List<ProductDetail> listDetails = new ArrayList<>();
-            for (ProductDetailRequest detailReq : request.getProductDetails()) {
+            for (ProductDetailCreateRequest detailReq : request.getProductDetails()) {
                 Configuration config = configurationRepository.findById(detailReq.getConfigurationId())
                         .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy cấu hình")));
 
