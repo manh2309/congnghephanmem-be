@@ -3,6 +3,7 @@ package org.example.techstore.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.example.techstore.dto.request.account.CreateAccountRequest;
 import org.example.techstore.dto.request.auth.AuthRequest;
 import org.example.techstore.dto.request.auth.RefreshTokenRequest;
 import org.example.techstore.dto.response.ApiResponse;
@@ -36,5 +37,10 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> logout() {
         ApiResponse response = authService.logout();
         return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PostMapping("/register")
+    public ApiResponse<Object> register(@RequestBody CreateAccountRequest request) {
+        return authService.register(request);
     }
 }
