@@ -36,14 +36,19 @@ public class SecurityConfig {
             "/swagger-api/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**",
+            "/webjars/**"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // ⭐ BẮT BUỘC để fix CORS
+                .cors(cors -> {})
+
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(PUBLIC_URLS).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/brands/all").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/brands/{id}/restore").hasRole("ADMIN")
@@ -106,7 +111,6 @@ public class SecurityConfig {
 
                                 // PRODUCT DETAIL
                                 .requestMatchers(HttpMethod.GET, "/api/product-details/all").hasAnyRole("ADMIN", "STAFF")
-                                .requestMatchers(HttpMethod.GET, "/api/product-details/product/{productId}").hasAnyRole("ADMIN", "STAFF","USER")
                                 .requestMatchers(HttpMethod.PUT, "/api/product-details/{id}/restore").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/product-details", "/api/product-details/{id}").hasAnyRole("ADMIN", "STAFF", "USER")
                                 .requestMatchers(HttpMethod.POST, "/api/product-details").hasAnyRole("ADMIN", "STAFF")
@@ -131,8 +135,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/configurations/{id}/restore").hasRole("ADMIN")
                                 //AI
-                                .requestMatchers("/api/analytics/smart-inventory").hasRole("ADMIN")
-                                .requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "STAFF", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/analytics/smart-inventory").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess ->
@@ -155,7 +158,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
+
         return config.getAuthenticationManager();
     }
 

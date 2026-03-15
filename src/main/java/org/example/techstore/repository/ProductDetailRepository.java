@@ -29,10 +29,16 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, Lo
 
     Optional<ProductDetail> findByProductIdAndConfigurationIdAndIsActiveTrue(Long productId, Long configurationId);
 
-    @Query("SELECT pd FROM ProductDetail pd " +
-            "LEFT JOIN FETCH pd.configuration c " +
-            "LEFT JOIN FETCH c.specifications s " +
-            "WHERE pd.product.id = :productId AND pd.isActive = 1")
+    @Query("""
+SELECT DISTINCT pd
+FROM ProductDetail pd
+LEFT JOIN FETCH pd.configuration c
+LEFT JOIN FETCH c.specifications
+LEFT JOIN FETCH pd.product p
+LEFT JOIN FETCH p.brand
+LEFT JOIN FETCH p.category
+WHERE p.id = :productId AND pd.isActive = 1
+""")
     List<ProductDetail> findByProductId(@Param("productId") Long productId);
 
     List<ProductDetail> findByProductIdAndIsActiveTrue(Long productId);

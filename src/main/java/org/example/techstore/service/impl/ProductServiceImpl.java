@@ -128,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
         return ApiResponse.builder()
                 .code(StatusCode.SUCCESS.getCode())
                 .message(String.format(Constant.MESSAGE.CREATE_SUCCESS, Constant.MODULE.PRODUCT))
-                .result(null)
+                .result(savedProduct.getId())
                 .build();
     }
 
