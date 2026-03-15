@@ -2,9 +2,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/qlsaledt
+    url: jdbc:mysql://localhost:3306/tech-store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: truc
+    password: Thanh123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -25,3 +25,12 @@ application:
     expiration: 900000  # 15 phút
     refresh-token:
       expiration: 604800000  # 7 ng?y
+telegram:
+  bot:
+    token: 7696077044:AAELvKNUECYUxG6vXGH0p2zvLZH8MhXpxBw
+  chat:
+    id: 6999594920
+gemini:
+  api:
+    key: "dasdasdasd"
+    url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"

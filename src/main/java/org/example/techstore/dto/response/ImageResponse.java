@@ -17,5 +17,6 @@ public class ImageResponse {
     private Boolean isMain;
 
     private Long productId;
+    private String productName;
 
 }

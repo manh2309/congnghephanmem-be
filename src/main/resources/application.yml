@@ -2,9 +2,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/tech-store
+    url: jdbc:mysql://localhost:3306/tech-store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: ${DB_PASSWORD}
+    password: Thanh123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
@@ -32,5 +32,5 @@ telegram:
     id: 6999594920
 gemini:
   api:
-    key: ${KEY_GEMINI}
+    key: "dasdasdasd"
     url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"

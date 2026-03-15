@@ -110,6 +110,7 @@ public class ImageServiceImpl implements ImageService {
                         .imageUrl(image.getImageUrl())
                         .isMain(image.getIsMain())
                         .productId(image.getProduct() != null ? image.getProduct().getId() : null)
+                        .productName(image.getProduct() != null ? image.getProduct().getName() : null) // ⭐ thêm dòng này
                         .build())
                 .toList();
 
@@ -119,6 +120,7 @@ public class ImageServiceImpl implements ImageService {
                 .result(responses)
                 .build();
     }
+
     @Override
     public ApiResponse<Object> getImagesByProductId(Long productId) {
 
