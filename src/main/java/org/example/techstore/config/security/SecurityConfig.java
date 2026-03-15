@@ -131,7 +131,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/configurations/{id}/restore").hasRole("ADMIN")
                                 //AI
-                                .requestMatchers(HttpMethod.GET, "/api/analytics/smart-inventory").hasRole("ADMIN")
+                                .requestMatchers("/api/analytics/smart-inventory").hasRole("ADMIN")
+                                .requestMatchers("/api/chat/**").hasAnyRole("ADMIN", "STAFF", "USER")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess ->
