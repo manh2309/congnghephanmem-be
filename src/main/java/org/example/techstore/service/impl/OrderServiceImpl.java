@@ -265,31 +265,39 @@ public class OrderServiceImpl implements OrderService {
 
         String totalText = currencyFormat.format(order.getTotalPrice());
 
+        String vatText = currencyFormat.format(order.getVat());
         String safeNote =
                 order.getNote() == null
                         ? "Không có"
                         : StringEscapeUtils.escapeHtml4(order.getNote());
 
         String message = """
-                🛎️ <b>ĐƠN HÀNG MỚI</b>
+            🛎️ <b>THÔNG BÁO: ĐƠN HÀNG MỚI</b>
 
-                🆔 %s
-                👤 %s
-                📞 %s
-                📍 %s
+            🆔 <b>Mã đơn hàng:</b> %s
+            👤 <b>Khách hàng:</b> %s
+            📞 <b>SĐT:</b> %s
+            📍 <b>Địa chỉ:</b> %s
 
-                📦 <pre>%s</pre>
+            💳 <b>Phương thức thanh toán:</b> %s
 
-                📝 <pre>%s</pre>
+            📦 <b>Sản phẩm:</b>
+            <pre>%s</pre>
 
-                💰 %s ₫
-                """.formatted(
+            📝 <b>Ghi chú:</b>
+            <pre>%s</pre>
+
+            🧾 <b>VAT:</b> %s ₫
+            💰 <b>Tổng tiền:</b> %s ₫
+            """.formatted(
                 order.getOrderCode(),
                 order.getCustomerName(),
                 order.getCustomerPhone(),
                 order.getCustomerAddress(),
+                order.getPaymentMethod(),
                 productList,
                 safeNote,
+                vatText,
                 totalText
         );
 
