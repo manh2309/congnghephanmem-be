@@ -1,5 +1,6 @@
 package org.example.techstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -55,6 +56,7 @@ public class Order extends BaseEntity {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JsonIgnore
     private List<OrderDetail> orderDetails;
 
     @PrePersist

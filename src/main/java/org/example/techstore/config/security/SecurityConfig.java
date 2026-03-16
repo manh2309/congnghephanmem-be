@@ -50,6 +50,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
                                 .requestMatchers(PUBLIC_URLS).permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/brands/all").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/brands/{id}/restore").hasRole("ADMIN")
@@ -83,7 +84,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/orders/account/{accountId}").hasAnyRole("ADMIN", "STAFF", "USER")
                                 .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
                                 .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}").hasAnyRole("ADMIN", "STAFF")
-                                .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}/status").hasAnyRole("ADMIN", "STAFF")
+                                .requestMatchers(HttpMethod.PATCH, "/api/orders/{id}/status").hasAnyRole("ADMIN", "STAFF", "USER")
                                 //ORDER_DETAIL
                                 .requestMatchers(HttpMethod.GET, "/api/order-details").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.GET, "/api/order-details/all").hasRole("ADMIN")

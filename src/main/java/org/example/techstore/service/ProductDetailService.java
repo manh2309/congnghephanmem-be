@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductDetailService {
 
-    ApiResponse<Object> findAll(String searchKey, Pageable pageable);
+    ApiResponse<Object> findAll(String searchKey, Long categoryId, Long brandId, Pageable pageable);
 
     ApiResponse<Object> findAllIncludingDeleted(Pageable pageable);
 

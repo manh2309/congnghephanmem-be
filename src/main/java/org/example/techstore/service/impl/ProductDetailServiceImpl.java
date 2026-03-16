@@ -27,7 +27,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -42,16 +44,32 @@ public class ProductDetailServiceImpl implements ProductDetailService {
 
 
     @Override
-    public ApiResponse<Object> findAll(String searchKey, Pageable pageable) {
+    public ApiResponse<Object> findAll(String searchKey, Long categoryId, Long brandId, Pageable pageable) {
 
         Page<ProductDetail> page = productDetailRepository.findAll(
-                ProductDetailSpecification.searchByKey(searchKey),
+                ProductDetailSpecification.filter(searchKey, categoryId, brandId),
                 pageable
         );
 
-        List<ProductDetailResponse> data = page.getContent()
+        List<Map<String, Object>> data = page.getContent()
                 .stream()
-                .map(productDetailMapper::toResponse)
+                .map(pd -> {
+
+                    ProductDetailResponse dto = productDetailMapper.toResponse(pd);
+
+                    Map<String, Object> map = new HashMap<>();
+
+                    map.put("productDetail", dto);
+                    map.put("product", pd.getProduct());
+                    map.put("brand", pd.getProduct() != null ? pd.getProduct().getBrand() : null);
+                    map.put("category", pd.getProduct() != null ? pd.getProduct().getCategory() : null);
+                    map.put("images", pd.getProduct() != null ? pd.getProduct().getImages() : null);
+                    map.put("configuration", pd.getConfiguration());
+                    map.put("specifications", pd.getConfiguration() != null ? pd.getConfiguration().getSpecifications() : null);
+
+                    return map;
+
+                })
                 .toList();
 
         MetaResponse meta = MetaResponse.builder()

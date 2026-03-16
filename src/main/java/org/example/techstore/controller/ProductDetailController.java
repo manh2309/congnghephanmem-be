@@ -27,6 +27,9 @@ public class ProductDetailController {
     @Operation(summary = "Lấy danh sách product detail", description = "Chỉ lấy dữ liệu chưa bị xoá")
     public ApiResponse<Object> getAllProductDetails(
             @RequestParam(required = false) String searchKey,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long brandId,
+
             @PageableDefault(
                     page = 0,
                     size = 10,
@@ -35,7 +38,7 @@ public class ProductDetailController {
             )
             Pageable pageable
     ) {
-        return productDetailService.findAll(searchKey, pageable);
+        return productDetailService.findAll(searchKey, categoryId, brandId, pageable);
     }
 
     @GetMapping("/all")

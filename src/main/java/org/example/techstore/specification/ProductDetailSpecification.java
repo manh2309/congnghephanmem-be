@@ -7,35 +7,42 @@ import org.example.techstore.entity.ProductDetail;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProductDetailSpecification {
-    public static Specification<ProductDetail> searchByKey(String searchKey) {
+    public static Specification<ProductDetail> filter(
+            String searchKey,
+            Long categoryId,
+            Long brandId
+    ) {
+
         return (root, query, cb) -> {
 
-            Predicate isActive = cb.equal(root.get("isActive"), 1L);
+            List<Predicate> predicates = new ArrayList<>();
 
-            if (searchKey == null || searchKey.trim().isEmpty()) {
-                return isActive;
+            if (searchKey != null && !searchKey.isEmpty()) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("product").get("name")),
+                                "%" + searchKey.toLowerCase() + "%"
+                        )
+                );
             }
 
-            String keyword = "%" + searchKey.trim().toLowerCase() + "%";
+            if (categoryId != null) {
+                predicates.add(
+                        cb.equal(root.get("product").get("category").get("id"), categoryId)
+                );
+            }
 
-            Join<ProductDetail, Product> productJoin = root.join("product");
-            Join<ProductDetail, Configuration> configJoin = root.join("configuration");
+            if (brandId != null) {
+                predicates.add(
+                        cb.equal(root.get("product").get("brand").get("id"), brandId)
+                );
+            }
 
-            Predicate byProductName = cb.like(
-                    cb.lower(productJoin.get("name")),
-                    keyword
-            );
-
-            Predicate byConfiguration = cb.like(
-                    cb.lower(configJoin.get("name")),
-                    keyword
-            );
-
-            return cb.and(
-                    isActive,
-                    cb.or(byProductName, byConfiguration)
-            );
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

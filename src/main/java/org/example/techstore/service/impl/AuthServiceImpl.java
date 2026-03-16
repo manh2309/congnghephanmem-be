@@ -23,6 +23,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,12 +38,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ApiResponse<AuthResponse> login(AuthRequest authRequest) {
         try {
+
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
             );
 
-            Account accountEntity = accountRepository.findByUsername(authRequest.getUsername())
-                    .orElseThrow(() -> new AppException(StatusCode.BAD_REQUEST.withMessage(String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ACCOUNT))));
+            Account accountEntity = accountRepository
+                    .findByUsername(authRequest.getUsername())
+                    .orElseThrow(() -> new AppException(
+                            StatusCode.BAD_REQUEST.withMessage(
+                                    String.format(Constant.ERROR_MESSAGE.NOT_FOUND, Constant.MODULE.ACCOUNT)
+                            )
+                    ));
 
             String token = jwtUtil.generateToken(accountEntity);
             String refreshToken = jwtUtil.generateRefreshToken(accountEntity);
@@ -48,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
             AuthResponse authResponse = AuthResponse.builder()
                     .token(token)
                     .refreshToken(refreshToken)
+                    .user(accountEntity)
                     .build();
 
             return ApiResponse.<AuthResponse>builder()
@@ -57,13 +70,17 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
         } catch (BadCredentialsException e) {
+
             return ApiResponse.<AuthResponse>builder()
                     .code(401)
                     .message(Constant.ERROR_MESSAGE.USER_PASS_FOUND)
                     .result(null)
                     .build();
+
         } catch (Exception e) {
+
             e.printStackTrace();
+
             return ApiResponse.<AuthResponse>builder()
                     .code(500)
                     .message("Lỗi hệ thống: " + e.getMessage())
