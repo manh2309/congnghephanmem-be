@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
                 ProductDetail productDetail =
                         productDetailRepository
-                                .findByProductIdAndConfigurationIdAndIsActiveTrue(
+                                .findProductDetailByConfig(
                                         pdReq.getProductId(),
                                         pdReq.getConfigurationId()
                                 )
