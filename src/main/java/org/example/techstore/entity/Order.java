@@ -38,7 +38,7 @@ public class Order extends BaseEntity {
     @Column(precision = 15, scale = 2)
     private BigDecimal totalPrice;
 
-    @Column(precision = 5, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal vat;
 
     @Column(length = 500)

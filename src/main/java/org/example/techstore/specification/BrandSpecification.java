@@ -9,10 +9,12 @@ public class BrandSpecification {
 
     public static Specification<Brand> searchByKey(String searchKey) {
         return (root, query, cb) -> {
+            // Luôn luôn phải có điều kiện này
             Predicate isActive = cb.equal(root.get("isActive"), 1L);
 
+            // Nếu không gõ chữ gì để tìm kiếm, THÌ CHỈ return thằng isActive
             if (searchKey == null || searchKey.trim().isEmpty()) {
-                return cb.conjunction(); // không filter
+                return isActive;
             }
 
             String keyword = "%" + searchKey.trim().toLowerCase() + "%";
@@ -27,7 +29,7 @@ public class BrandSpecification {
                     keyword
             );
 
-            // brandCode OR name
+            // Gộp cả 2: Phải đang active VÀ (tên giống HOẶC mã giống)
             return cb.and(
                     isActive,
                     cb.or(byCode, byName)

@@ -18,4 +18,5 @@ public interface OrderService {
 
     ApiResponse<Object> updateOrderStatus(Long id, OrderStatusDTO request);
 
+    ApiResponse<Object> cancelOrderByUser(Long id);
 }

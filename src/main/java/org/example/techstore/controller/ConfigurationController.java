@@ -56,7 +56,7 @@ public class ConfigurationController {
         return configurationService.create(config);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "Cập nhật một phần Configuration")
     public ApiResponse<Object> update(@PathVariable Long id, @RequestBody ConfigurationRequest configuration) {
         return configurationService.update(id, configuration);

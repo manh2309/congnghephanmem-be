@@ -62,4 +62,9 @@ public class OrderController {
         return orderService.updateOrderStatus(id, request);
     }
 
+    @PatchMapping("/{id}/cancel")
+    @Operation(summary = "Khách hàng tự hủy đơn hàng")
+    public ApiResponse<Object> cancelOrderByUser(@PathVariable Long id) {
+        return orderService.cancelOrderByUser(id);
+    }
 }

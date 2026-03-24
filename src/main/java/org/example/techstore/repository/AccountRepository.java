@@ -25,6 +25,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     List<Account> findByRole_Id(Long roleId);
 
-    @Query(value = "SELECT a FROM Account a where a.isActive = 1")
+    @Query("SELECT a FROM Account a WHERE a.isActive = 1 AND a.role.id IN (1, 2)")
     List<Account> findByIsActiveTrue();
 }

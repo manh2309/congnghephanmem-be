@@ -37,13 +37,13 @@ public class SecurityConfig {
             "/swagger-api/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/api/chat/ask"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // ⭐ BẮT BUỘC để fix CORS
                 .cors(cors -> {})
 
                 .csrf(AbstractHttpConfigurer::disable)
@@ -137,7 +137,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/configurations/{id}").hasAnyRole("ADMIN", "STAFF")
                                 .requestMatchers(HttpMethod.PUT, "/api/configurations/{id}/restore").hasRole("ADMIN")
                                 //AI
-                        .requestMatchers(HttpMethod.GET, "/api/analytics/smart-inventory").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/analytics/smart-inventory", "/api/analytics/history").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess ->

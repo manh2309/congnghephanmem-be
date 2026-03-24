@@ -140,6 +140,18 @@ public class OrderServiceImpl implements OrderService {
                                         new AppException(StatusCode.BAD_REQUEST.withMessage("Không tìm thấy thông tin chi tiết sản phẩm"))
                                 );
 
+                if (productDetail.getQuantity() < detailReq.getQuantity()) {
+                    throw new AppException(StatusCode.BAD_REQUEST.withMessage(
+                            "Sản phẩm '" + productDetail.getProduct().getName() + "' cấu hình này không đủ số lượng trong kho! " +
+                                    "Kho hiện chỉ còn " + productDetail.getQuantity() + " chiếc."
+                    ));
+                }
+
+                // Trừ số lượng kho dưới Database
+                productDetail.setQuantity(productDetail.getQuantity() - detailReq.getQuantity());
+                productDetailRepository.save(productDetail);
+                // ==========================================
+
                 OrderDetail detail = new OrderDetail();
 
                 detail.setOrder(savedOrder);
@@ -156,7 +168,7 @@ public class OrderServiceImpl implements OrderService {
                 calculatedTotal = calculatedTotal.add(lineTotal);
 
                 productList.append(productDetail.getProduct().getName())
-                        .append("\n");
+                        .append(" (x").append(detailReq.getQuantity()).append(")\n");
             }
         }
 
@@ -219,6 +231,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional // THÊM CÁI NÀY VÀO ĐỂ BẢO VỆ DB LÚC HOÀN KHO
     public ApiResponse<Object> updateOrderStatus(Long id, OrderStatusDTO request) {
 
         Order order = orderRepository.findById(id)
@@ -232,13 +245,9 @@ public class OrderServiceImpl implements OrderService {
         OrderStatus newStatus = OrderStatus.fromCode(request.getStatus());
 
         boolean validTransition = switch (currentStatus) {
-
             case PENDING -> (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELED);
-
             case CONFIRMED -> (newStatus == OrderStatus.PENDING || newStatus == OrderStatus.SHIPPING);
-
             case SHIPPING -> (newStatus == OrderStatus.DELIVERED);
-
             case DELIVERED, CANCELED -> false;
         };
 
@@ -248,8 +257,20 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-        order.setStatus(newStatus);
+        if (newStatus == OrderStatus.CANCELED && currentStatus != OrderStatus.CANCELED) {
+            List<OrderDetail> orderDetails = order.getOrderDetails();
+            if (orderDetails != null) {
+                for (OrderDetail detail : orderDetails) {
+                    ProductDetail productDetail = detail.getProductDetail();
+                    // Cộng trả lại số lượng khách đã đặt vào kho (Restock)
+                    productDetail.setQuantity(productDetail.getQuantity() + detail.getQuantity());
+                    productDetailRepository.save(productDetail);
+                }
+            }
+        }
+        // ==========================================
 
+        order.setStatus(newStatus);
         orderRepository.save(order);
 
         return ApiResponse.builder()
@@ -304,4 +325,35 @@ public class OrderServiceImpl implements OrderService {
         telegramService.sendOrderMessage(message);
     }
 
+    @Override
+    @Transactional
+    public ApiResponse<Object> cancelOrderByUser(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new AppException(
+                        StatusCode.BAD_REQUEST.withMessage("Không tìm thấy đơn hàng")
+                ));
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new AppException(
+                    StatusCode.BAD_REQUEST.withMessage("Chỉ có thể hủy đơn hàng khi đang ở trạng thái Chờ xử lý")
+            );
+        }
+        List<OrderDetail> orderDetails = order.getOrderDetails();
+        if (orderDetails != null) {
+            for (OrderDetail detail : orderDetails) {
+                ProductDetail productDetail = detail.getProductDetail();
+                productDetail.setQuantity(productDetail.getQuantity() + detail.getQuantity());
+                productDetailRepository.save(productDetail);
+            }
+        }
+
+        // Đổi trạng thái thành CANCELED
+        order.setStatus(OrderStatus.CANCELED);
+        orderRepository.save(order);
+        
+
+        return ApiResponse.builder()
+                .message("Hủy đơn hàng thành công")
+                .result(order)
+                .build();
+    }
 }

@@ -3,6 +3,7 @@ package org.example.techstore.repository;
 import org.example.techstore.entity.Configuration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +18,8 @@ public interface ConfigurationRepository extends JpaRepository<Configuration, Lo
     @Query(value = "SELECT b FROM Configuration b WHERE b.isActive = 0")
     List<Configuration> findByIsActiveFalse();
 
-    @Query(value = "SELECT b FROM Configuration b WHERE b.isActive = 1")
-    Optional<Configuration> findByIdAndIsActiveTrue(Long id);
+    @Query(value = "SELECT b FROM Configuration b WHERE b.id = :id AND b.isActive = 1")
+    Optional<Configuration> findByIdAndIsActiveTrue(@Param("id") Long id);
 
     // Dùng để check trùng tên khi tạo mới
     Optional<Configuration> findByNameIgnoreCase(String name);

@@ -6,11 +6,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.example.techstore.dto.response.ApiResponse;
+import org.example.techstore.entity.InventoryForecastHistory;
 import org.example.techstore.service.AiAnalyticsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Analytics & AI", description = "API Thống kê Doanh thu và Dự báo AI")
@@ -33,5 +36,15 @@ public class AnalyticsController {
                 .result(aiAnalyticsService.generateSmartInventoryReport())
                 .build();
 
+    }
+
+    @GetMapping("/history")
+    public ApiResponse<Object> getForecastHistory(@RequestParam String productName) {
+        List<InventoryForecastHistory> history = aiAnalyticsService.getProductForecastHistory(productName);
+        return ApiResponse.builder()
+                .code(1000)
+                .message("Lấy lịch sử dự báo thành công")
+                .result(history)
+                .build();
     }
 }

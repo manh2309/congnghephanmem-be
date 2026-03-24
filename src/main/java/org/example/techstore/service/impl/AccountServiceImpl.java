@@ -69,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
 
     public ApiResponse<Object> getUsersRole2Statistics() {
 
-        List<UserStatisticResponse> statistics = accountRepository.findByRole_Id(2L)
+        List<UserStatisticResponse> statistics = accountRepository.findByRole_Id(3L)
                 .stream()
                 .map(account -> {
 

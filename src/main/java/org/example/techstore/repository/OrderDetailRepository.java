@@ -1,6 +1,7 @@
 package org.example.techstore.repository;
 
 import org.example.techstore.entity.OrderDetail;
+import org.example.techstore.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +39,16 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
             "GROUP BY p.name")
     List<Object[]> getSalesByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT COALESCE(SUM(od.quantity), 0) FROM OrderDetail od " +
+            "JOIN od.order o " +
+            "JOIN od.productDetail pd " +
+            "WHERE pd.product.id = :productId " +
+            "AND MONTH(o.createdDate) = :month " +
+            "AND YEAR(o.createdDate) = :year " +
+            "AND o.status = :status")
+    Integer calculateActualSoldPerMonth(
+            @Param("productId") Long productId,
+            @Param("month") int month,
+            @Param("year") int year,
+            @Param("status") OrderStatus status);
 }
