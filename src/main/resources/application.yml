@@ -27,9 +27,9 @@ application:
       expiration: 604800000  # 7 ng?y
 telegram:
   bot:
-    token: 7696077044:AAELvKNUECYUxG6vXGH0p2zvLZH8MhXpxBw
+    token: "7696077044:AAELvKNUECYUxG6vXGH0p2zvLZH8MhXpxBw"
   chat:
-    id: 6999594920
+    id: "-1003717788537"
 gemini:
   api:
     key: ${KEY_GEMINI}

@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -102,17 +103,15 @@ public class OrderServiceImpl implements OrderService {
                 ));
 
         Order order = new Order();
-
+        order.setOrderCode(generateOrderCode());
         order.setStatus(OrderStatus.fromCode(request.getStatus()));
         order.setCustomerName(request.getCustomerName());
         order.setCustomerPhone(request.getCustomerPhone());
         order.setCustomerAddress(request.getCustomerAddress());
         order.setPaymentMethod(PaymentMethod.fromCode(request.getPaymentMethod()));
         order.setNote(request.getNote());
-        order.setVat(request.getVat() == null
-                ? BigDecimal.ZERO
-                : BigDecimal.valueOf(request.getVat()));
 
+        order.setVat(BigDecimal.ZERO);
         order.setTotalPrice(BigDecimal.ZERO);
         order.setAccount(account);
         order.setCreatedDate(LocalDateTime.now());
@@ -172,9 +171,11 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        BigDecimal total = calculatedTotal.add(savedOrder.getVat());
+        BigDecimal vatAmount = calculatedTotal.multiply(new BigDecimal("0.1"));
+        BigDecimal finalTotal = calculatedTotal.add(vatAmount);
 
-        savedOrder.setTotalPrice(total);
+        savedOrder.setVat(vatAmount);
+        savedOrder.setTotalPrice(finalTotal);
 
         orderRepository.save(savedOrder);
 
@@ -273,56 +274,12 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(newStatus);
         orderRepository.save(order);
 
+        sendStatusUpdateTelegram(order);
+
         return ApiResponse.builder()
                 .message("Cập nhật trạng thái đơn hàng thành công")
                 .result(order)
                 .build();
-    }
-
-    private void sendTelegram(Order order, String productList) {
-
-        NumberFormat currencyFormat =
-                NumberFormat.getInstance(new Locale("vi", "VN"));
-
-        String totalText = currencyFormat.format(order.getTotalPrice());
-
-        String vatText = currencyFormat.format(order.getVat());
-        String safeNote =
-                order.getNote() == null
-                        ? "Không có"
-                        : StringEscapeUtils.escapeHtml4(order.getNote());
-
-        String message = """
-            🛎️ <b>THÔNG BÁO: ĐƠN HÀNG MỚI</b>
-
-            🆔 <b>Mã đơn hàng:</b> %s
-            👤 <b>Khách hàng:</b> %s
-            📞 <b>SĐT:</b> %s
-            📍 <b>Địa chỉ:</b> %s
-
-            💳 <b>Phương thức thanh toán:</b> %s
-
-            📦 <b>Sản phẩm:</b>
-            <pre>%s</pre>
-
-            📝 <b>Ghi chú:</b>
-            <pre>%s</pre>
-
-            🧾 <b>VAT:</b> %s ₫
-            💰 <b>Tổng tiền:</b> %s ₫
-            """.formatted(
-                order.getOrderCode(),
-                order.getCustomerName(),
-                order.getCustomerPhone(),
-                order.getCustomerAddress(),
-                order.getPaymentMethod(),
-                productList,
-                safeNote,
-                vatText,
-                totalText
-        );
-
-        telegramService.sendOrderMessage(message);
     }
 
     @Override
@@ -349,11 +306,86 @@ public class OrderServiceImpl implements OrderService {
         // Đổi trạng thái thành CANCELED
         order.setStatus(OrderStatus.CANCELED);
         orderRepository.save(order);
+
+        sendStatusUpdateTelegram(order);
         
 
         return ApiResponse.builder()
                 .message("Hủy đơn hàng thành công")
                 .result(order)
                 .build();
+    }
+
+    private void sendTelegram(Order order, String productList) {
+        NumberFormat currencyFormat = NumberFormat.getInstance(new Locale("vi", "VN"));
+        String totalText = currencyFormat.format(order.getTotalPrice()) + " ₫";
+        String vatText = currencyFormat.format(order.getVat()) + " ₫";
+        String safeNote = (order.getNote() == null || order.getNote().isEmpty())
+                ? "Không có"
+                : StringEscapeUtils.escapeHtml4(order.getNote());
+
+        // Đã sửa lại template nhìn cực kỳ chuyên nghiệp và sang xịn mịn
+        String message = """
+            🆕 <b>ĐƠN HÀNG MỚI TỪ TECHSTORE</b> 🆕
+            
+            📦 <b>Mã đơn:</b> #%s
+            👤 <b>Khách hàng:</b> %s
+            📞 <b>SĐT:</b> %s
+            📍 <b>Địa chỉ:</b> %s
+            💳 <b>Thanh toán:</b> %s
+            
+            🛒 <b>Chi tiết sản phẩm:</b>
+            <pre>%s</pre>
+            📝 <b>Ghi chú:</b> <i>%s</i>
+            
+            💵 <b>Tổng thanh toán:</b> <b>%s</b> <i>(Gồm VAT: %s)</i>
+            """.formatted(
+                order.getOrderCode(),
+                order.getCustomerName(),
+                order.getCustomerPhone(),
+                order.getCustomerAddress(),
+                order.getPaymentMethod(),
+                productList.trim(),
+                safeNote,
+                totalText,
+                vatText
+        );
+
+        telegramService.sendOrderMessage(message);
+    }
+
+    private void sendStatusUpdateTelegram(Order order) {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        String statusText = translateStatus(order.getStatus());
+
+        // Template cho việc chuyển trạng thái đơn hàng
+        String message = """
+            🔄 <b>CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG</b> 🔄
+            
+            📦 <b>Mã đơn:</b> #%s
+            👤 <b>Khách hàng:</b> %s
+            📊 <b>Trạng thái mới:</b> <b>%s</b>
+            
+            ⏰ <i>Thời gian cập nhật: %s</i>
+            """.formatted(
+                order.getOrderCode(),
+                order.getCustomerName(),
+                statusText,
+                time
+        );
+
+        telegramService.sendOrderMessage(message);
+    }
+
+    // Helper: Dịch trạng thái sang Tiếng Việt kèm Emoji cho dễ nhìn
+    private String translateStatus(OrderStatus status) {
+        return switch (status) {
+            case PENDING -> "⏳ Chờ xác nhận";
+            case CONFIRMED -> "✅ Đã xác nhận (Đang chuẩn bị hàng)";
+            case SHIPPING -> "🚚 Đang giao hàng";
+            case DELIVERED -> "🎉 Giao hàng thành công";
+            case CANCELED -> "❌ Đã hủy (Đã hoàn kho)";
+            default -> "❓ Không xác định";
+        };
     }
 }
