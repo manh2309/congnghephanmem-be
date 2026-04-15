@@ -64,7 +64,7 @@ public class OrderController {
 
     @PatchMapping("/{id}/cancel")
     @Operation(summary = "Khách hàng tự hủy đơn hàng")
-    public ApiResponse<Object> cancelOrderByUser(@PathVariable Long id) {
+    public ApiResponse<Object> cancelOrderByUser(@PathVariable("id") Long id) {
         return orderService.cancelOrderByUser(id);
     }
 }
