@@ -151,7 +151,7 @@ public class AiAnalyticsServiceImpl implements AiAnalyticsService {
 
         for (InventoryForecastDTO dto : mlForecastData) {
             InventoryForecastHistory history = historyRepo
-                    .findByProductNameAndForecastMonthAndForecastYear(dto.getProductName(), currentMonth, currentYear)
+                    .findFirstByProductNameAndForecastMonthAndForecastYear(dto.getProductName(), currentMonth, currentYear)
                     .orElse(new InventoryForecastHistory());
 
             history.setProductName(dto.getProductName());

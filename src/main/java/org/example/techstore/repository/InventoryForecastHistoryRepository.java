@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface InventoryForecastHistoryRepository extends JpaRepository<InventoryForecastHistory, Long> {
 
-    Optional<InventoryForecastHistory> findByProductNameAndForecastMonthAndForecastYear(String productName, int month, int year);
+    Optional<InventoryForecastHistory> findFirstByProductNameAndForecastMonthAndForecastYear(String productName, int month, int year);
 
     List<InventoryForecastHistory> findByProductName(String productName);
 }
