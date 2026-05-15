@@ -184,7 +184,6 @@ public class AiAnalyticsServiceImpl implements AiAnalyticsService {
         // Lấy lịch sử từ DB
         List<InventoryForecastHistory> history = historyRepo.findByProductName(productName);
 
-        // 🛑 BÍ KÍP DEMO: Nếu DB rỗng (chưa chạy đủ nhiều tháng), ta Fake Data để vẽ biểu đồ cho đẹp!
         if (history == null || history.isEmpty()) {
             log.warn("Chưa có lịch sử đủ dài cho {}, dùng Mock Data để vẽ Biểu đồ...", productName);
             history = new ArrayList<>();
